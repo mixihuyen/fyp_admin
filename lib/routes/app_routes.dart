@@ -7,5 +7,6 @@ import '../app.dart';
 class TAppRoute {
   static final List<GetPage> pages =[
     GetPage(name: TRoutes.home, page:() => const HomeScreen(), middlewares: [TRouteMiddleware()]),
+    GetPage(name: TRoutes.responsiveDesign, page:() => const ResponsiveDesignScreen(), middlewares: [TRouteMiddleware()]),
   ];
 }

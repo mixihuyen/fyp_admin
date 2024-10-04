@@ -1,5 +1,6 @@
 class TRoutes {
   static const home = '/';
+  static const responsiveDesign = '/responsiveDesign';
   static const login = '/login';
   static const forgetPassword = '/forgetPassword';
   static const resetPassword = '/resetPassword';
@@ -8,5 +9,10 @@ class TRoutes {
   static const categories = '/categories';
   static const customer = '/customer';
   static const createCustomer = '/createCustomer';
+
+  static List sideBarMenuItems = [
+    home,
+    responsiveDesign
+  ];
 
 }
