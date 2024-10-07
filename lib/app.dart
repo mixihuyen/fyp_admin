@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_admin_panel/bindings/general_bindings.dart';
 import 'package:fyp_admin_panel/common/widgets/containers/rounded_container.dart';
 import 'package:fyp_admin_panel/common/widgets/layouts/templates/site_layout.dart';
 import 'package:fyp_admin_panel/common/widgets/responsive/responsive_deisgn.dart';
@@ -22,7 +23,8 @@ class App extends StatelessWidget {
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
       getPages: TAppRoute.pages,
-      initialRoute: TRoutes.login,
+      initialBinding: GeneralBindings(),
+      initialRoute: TRoutes.responsiveDesign,
       unknownRoute: GetPage(name: '/page-not-found', page: () => const Scaffold(body: Center(child: Text('Page Not Found')))),
     );
   }

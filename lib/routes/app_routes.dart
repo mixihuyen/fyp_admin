@@ -12,7 +12,7 @@ class TAppRoute {
     GetPage(name: TRoutes.login, page:() => const LoginScreen()),
     GetPage(name: TRoutes.forgetPassword, page:() => const ForgetPasswordScreen()),
     GetPage(name: TRoutes.resetPassword, page:() => const ResetPasswordScreen()),
-    GetPage(name: TRoutes.home, page:() => const HomeScreen(), middlewares: [TRouteMiddleware()]),
+    GetPage(name: TRoutes.trip, page:() => const HomeScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.responsiveDesign, page:() => const ResponsiveDesignScreen(), middlewares: [TRouteMiddleware()]),
   ];
 }
