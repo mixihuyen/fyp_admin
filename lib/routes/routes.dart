@@ -2,8 +2,8 @@ class TRoutes {
   static const home = '/';
   static const responsiveDesign = '/responsiveDesign';
   static const login = '/login';
-  static const forgetPassword = '/forgetPassword';
-  static const resetPassword = '/resetPassword';
+  static const forgetPassword = '/forget-password/';
+  static const resetPassword = '/reset-password';
   static const trip = '/trip';
   static const booking = '/booking';
   static const categories = '/categories';

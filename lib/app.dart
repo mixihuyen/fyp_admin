@@ -22,7 +22,7 @@ class App extends StatelessWidget {
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
       getPages: TAppRoute.pages,
-      initialRoute: TRoutes.responsiveDesign,
+      initialRoute: TRoutes.login,
       unknownRoute: GetPage(name: '/page-not-found', page: () => const Scaffold(body: Center(child: Text('Page Not Found')))),
     );
   }
