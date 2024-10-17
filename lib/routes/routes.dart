@@ -13,6 +13,8 @@ class TRoutes {
 
   static List sideBarMenuItems = [
     trip,
+    station,
+    categories,
   ];
 
 }

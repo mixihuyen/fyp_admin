@@ -53,9 +53,9 @@ class StationsWidgets extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 100),
                   const Row(mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Image(image: AssetImage(TImages.lightAppLogo), height: 500, width: 500)])
+                      children: [Expanded(child: Image(image: AssetImage(TImages.lightAppLogo), height: 300, width: 300))])
                 ],
               ),
             ),

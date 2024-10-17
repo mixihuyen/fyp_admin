@@ -1,4 +1,4 @@
-import 'package:fyp_admin_panel/features/application/screens/location/station_screen.dart';
+
 import 'package:fyp_admin_panel/features/application/screens/trip/trip.dart';
 import 'package:fyp_admin_panel/features/authentication/screens/forget_password/forget_password.dart';
 import 'package:fyp_admin_panel/features/authentication/screens/reset_password/reset_password.dart';
@@ -7,6 +7,8 @@ import 'package:fyp_admin_panel/routes/routes_middleware.dart';
 import 'package:get/get.dart';
 
 import '../app.dart';
+import '../features/application/screens/category/category_screen.dart';
+import '../features/application/screens/station/station_screen.dart';
 import '../features/authentication/screens/login/login.dart';
 
 class TAppRoute {
@@ -16,6 +18,7 @@ class TAppRoute {
     GetPage(name: TRoutes.resetPassword, page:() => const ResetPasswordScreen()),
     GetPage(name: TRoutes.trip, page:() => const TripScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.station, page:() => const StationScreen(), middlewares: [TRouteMiddleware()]),
+    GetPage(name: TRoutes.categories, page:() => const CategoryScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.responsiveDesign, page:() => const ResponsiveDesignScreen(), middlewares: [TRouteMiddleware()]),
   ];
 }
