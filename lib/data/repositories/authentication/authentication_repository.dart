@@ -23,13 +23,15 @@ class AuthenticationRepository extends GetxController{
 
   @override
   void onReady() {
+    super.onReady();
     _auth.setPersistence(Persistence.LOCAL);
+    screenRedirect();
   }
 
   screenRedirect() async {
     final user = _auth.currentUser;
     if (user != null) {
-      Get.offAllNamed(TRoutes.responsiveDesign);
+      Get.offAllNamed(TRoutes.trip);
       } else {
       Get.offAllNamed(TRoutes.login);
       }

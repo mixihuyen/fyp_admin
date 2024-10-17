@@ -21,14 +21,13 @@ class TLoginFrom extends StatelessWidget {
     return Form(
       key: controller.loginFormKey,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            vertical: TSizes.spaceBtwSections),
+        padding: const EdgeInsets.symmetric(vertical: TSizes.spaceBtwSections),
         child: Column(
           children: [
             //Email
             TextFormField(
               controller: controller.email,
-              validator:  TValidator.validateEmail,
+              validator: TValidator.validateEmail,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Iconsax.direct_right),
                 labelText: TTexts.email,
@@ -39,7 +38,8 @@ class TLoginFrom extends StatelessWidget {
             /// Password
             Obx(
               () => TextFormField(
-                validator: (value) => TValidator.validateEmptyText('Password', value),
+                validator: (value) =>
+                    TValidator.validateEmptyText('Password', value),
                 controller: controller.password,
                 obscureText: controller.hidePassword.value,
                 decoration: InputDecoration(
@@ -47,7 +47,7 @@ class TLoginFrom extends StatelessWidget {
                   prefixIcon: const Icon(Iconsax.password_check),
                   suffixIcon: IconButton(
                     onPressed: () => controller.hidePassword.value =
-                    !controller.hidePassword.value,
+                        !controller.hidePassword.value,
                     icon: Icon(controller.hidePassword.value
                         ? Iconsax.eye_slash
                         : Iconsax.eye),
@@ -66,11 +66,11 @@ class TLoginFrom extends StatelessWidget {
                   children: [
                     Obx(
                           () => Checkbox(
-                          value: controller.rememberMe.value,
-                          onChanged: (value) => controller.rememberMe.value =
-                          value!),
+                        value: controller.rememberMe.value,
+                        onChanged: (value) => controller.rememberMe.value = value!,
+                      ),
                     ),
-                    const Text(TTexts.rememberMe)
+                    const Text('Remember Me')
                   ],
                 ),
 
@@ -85,8 +85,10 @@ class TLoginFrom extends StatelessWidget {
 
             /// Sign In Button
             SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(onPressed: () => controller.emailAndPasswordSignIn(), child: const Text(TTexts.signIn)),
+              width: double.infinity,
+              child: ElevatedButton(
+                  onPressed: () => controller.emailAndPasswordSignIn(),
+                  child: const Text(TTexts.signIn)),
             ),
           ],
         ),

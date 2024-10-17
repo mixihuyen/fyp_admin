@@ -11,6 +11,7 @@ import '../../../utils/constants/image_strings.dart';
 import '../../../utils/helpers/network_manager.dart';
 import '../../../utils/popups/full_screen_loader.dart';
 import '../../../utils/popups/loaders.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   static LoginController get instance => Get.find();
@@ -26,10 +27,24 @@ class LoginController extends GetxController {
 
   @override
   void onInit() {
-    email.text = localStorage.read('REMEMBER_ME_EMAIL') ?? '';
-    password.text = localStorage.read('REMEMBER_ME_PASSWORD') ?? '';
+    // Lấy giá trị đã lưu từ GetStorage và gán lại cho rememberMe
+    rememberMe.value = localStorage.read('REMEMBER_ME_CHECKED') ?? false;
+
+    if (rememberMe.value) {
+      email.text = localStorage.read('REMEMBER_ME_EMAIL') ?? '';
+      password.text = localStorage.read('REMEMBER_ME_PASSWORD') ?? '';
+    }
+
+    // In ra để kiểm tra khi khởi động lại ứng dụng
+    print('Remember Me Checked on App Start: ${localStorage.read('REMEMBER_ME_CHECKED')}');
+    print('Email on App Start: ${localStorage.read('REMEMBER_ME_EMAIL')}');
+    print('Password on App Start: ${localStorage.read('REMEMBER_ME_PASSWORD')}');
+
     super.onInit();
   }
+
+
+
 
   Future<void> emailAndPasswordSignIn() async {
     try {
@@ -51,7 +66,24 @@ class LoginController extends GetxController {
       if (rememberMe.value) {
         localStorage.write('REMEMBER_ME_EMAIL', email.text.trim());
         localStorage.write('REMEMBER_ME_PASSWORD', password.text.trim());
+        localStorage.write('REMEMBER_ME_CHECKED', true);
+
+        // In ra để kiểm tra
+        print('Stored Email: ${localStorage.read('REMEMBER_ME_EMAIL')}');
+        print('Stored Password: ${localStorage.read('REMEMBER_ME_PASSWORD')}');
+        print('Remember Me Checked: ${localStorage.read('REMEMBER_ME_CHECKED')}');
+      } else {
+        localStorage.remove('REMEMBER_ME_EMAIL');
+        localStorage.remove('REMEMBER_ME_PASSWORD');
+        localStorage.write('REMEMBER_ME_CHECKED', false);
+
+        // In ra để kiểm tra sau khi xóa
+        print('Email after remove: ${localStorage.read('REMEMBER_ME_EMAIL')}');
+        print('Password after remove: ${localStorage.read('REMEMBER_ME_PASSWORD')}');
+        print('Remember Me Checked after remove: ${localStorage.read('REMEMBER_ME_CHECKED')}');
       }
+
+
       //Login user using Email & Password Authentication
       await AuthenticationRepository.instance.loginWithEmailAndPassword(email.text.trim(), password.text.trim());
 
