@@ -5,6 +5,7 @@ class TRoutes {
   static const forgetPassword = '/forget-password/';
   static const resetPassword = '/reset-password';
   static const station = '/station';
+  static const province = '/province';
   static const trip = '/trip';
   static const booking = '/booking';
   static const categories = '/categories';
@@ -15,6 +16,7 @@ class TRoutes {
     trip,
     station,
     categories,
+    province,
   ];
 
 }
