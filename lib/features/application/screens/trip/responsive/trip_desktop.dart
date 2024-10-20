@@ -14,7 +14,7 @@ class TripScreenDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(32.0),
         child: Obx(() {
           if (controller.stations.isEmpty ||
               controller.categories.isEmpty ||

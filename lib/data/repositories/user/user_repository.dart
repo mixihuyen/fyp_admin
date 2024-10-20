@@ -43,4 +43,50 @@ class UserRepository extends GetxController {
       throw 'Something went wrong. Please try again';
     }
   }
+
+  // Fetch all users from Firestore
+  Future<List<UserModel>> fetchAllUsers() async {
+    try {
+      final snapshot = await _db.collection('Users').get();
+      return snapshot.docs.map((doc) => UserModel.fromSnapshot(doc)).toList();
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong. Please try again';
+    }
+  }
+
+  // Update an existing user in Firestore
+  Future<void> updateUser(UserModel user) async {
+    try {
+      await _db.collection('Users').doc(user.id).update(user.toJson());
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong. Please try again';
+    }
+  }
+
+  // Delete a user from Firestore
+  Future<void> deleteUser(String userId) async {
+    try {
+      await _db.collection('Users').doc(userId).delete();
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong. Please try again';
+    }
+  }
 }

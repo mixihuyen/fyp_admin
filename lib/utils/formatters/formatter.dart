@@ -16,6 +16,10 @@ class TFormatter {
     return numberFormat.format(price);
   }
 
+  static String formatCellValue(String? value) {
+    return (value == null || value.isEmpty) ? 'N/A' : value;
+  }
+
   static String formatCurrency(double amount) {
     return NumberFormat.currency(locale: 'en_US', symbol: '\$').format(amount); // Customize the currency locale and symbol as needed
   }

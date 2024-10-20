@@ -43,7 +43,7 @@ class TripScreenTabletMobile extends StatelessWidget {
       final trips = controller.trips;
 
       if (trips.isEmpty) {
-        return const Center(child: Text('Không tìm thấy chuyến đi nào.'));
+        return const Center(child: Text('No trips found.'));
       }
 
       return ListView.builder(
