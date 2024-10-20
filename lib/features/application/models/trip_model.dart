@@ -1,42 +1,56 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fyp_admin_panel/features/application/models/start_model.dart';
+
+import 'end_model.dart';
+
 class TripModel {
-  String? id;
-  String from;
-  String to;
-  String startTime;
-  String endTime;
+  String id;
   double price;
-  String busType;
+  String? categoryId;
+  StartModel? start;
+  EndModel? end;
 
   TripModel({
-    this.id,
-    required this.from,
-    required this.to,
-    required this.startTime,
-    required this.endTime,
+    required this.id,
     required this.price,
-    required this.busType,
+    this.categoryId,
+    this.start,
+    this.end,
   });
 
-  Map<String, dynamic> toMap() {
+  static TripModel empty() => TripModel(id: '', price: 0);
+
+  Map<String, dynamic> toJson() {
     return {
-      'from': from,
-      'to': to,
-      'startTime': startTime,
-      'endTime': endTime,
-      'price': price,
-      'busType': busType,
+      'Price': price,
+      'CategoryId': categoryId,
+      'Start': start?.toJson(),
+      'End': end?.toJson(),
     };
   }
 
-  factory TripModel.fromMap(Map<String, dynamic> map, String id) {
+  factory TripModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+    final data = document.data()!;
+
+    // Kiểm tra và chuyển đổi giá trị price
+    final dynamic priceValue = data['Price'];
+    double price = 0;
+
+    // Nếu giá trị là chuỗi, chuyển nó thành double
+    if (priceValue is String) {
+      price = double.tryParse(priceValue) ?? 0;
+    }
+    // Nếu giá trị là số, giữ nguyên
+    else if (priceValue is num) {
+      price = priceValue.toDouble();
+    }
+
     return TripModel(
-      id: id,
-      from: map['from'] ?? '',
-      to: map['to'] ?? '',
-      startTime: map['startTime'] ?? '',
-      endTime: map['endTime'] ?? '',
-      price: map['price'].toDouble(),
-      busType: map['busType'] ?? '',
+      id: document.id,
+      price: price,
+      categoryId: data['CategoryId'],
+      start: StartModel.fromJson(data['Start']),
+      end: EndModel.fromJson(data['End']),
     );
   }
 }

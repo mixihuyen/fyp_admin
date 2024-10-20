@@ -11,9 +11,6 @@ class CategoryScreenMobile extends StatelessWidget {
     final TextEditingController nameController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Category Management'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(

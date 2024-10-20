@@ -11,9 +11,6 @@ class StationScreenMobile extends StatelessWidget {
     final TextEditingController nameController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Stations Management'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0), // Padding nhỏ hơn cho mobile
         child: Column(

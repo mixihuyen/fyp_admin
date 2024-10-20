@@ -7,6 +7,14 @@ class TFormatter {
     final onlyTime = DateFormat('hh:mm').format(date);
     return '$onlyDate at $onlyTime';
   }
+  static String format(double price) {
+    final numberFormat = NumberFormat.currency(
+      locale: 'vi_VN',
+      symbol: 'VND',
+      decimalDigits: 0,
+    );
+    return numberFormat.format(price);
+  }
 
   static String formatCurrency(double amount) {
     return NumberFormat.currency(locale: 'en_US', symbol: '\$').format(amount); // Customize the currency locale and symbol as needed
