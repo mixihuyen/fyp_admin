@@ -23,7 +23,7 @@ class UserManagementTabletMobileScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final users = userController.users;
+          final users = userController.filteredUsers;
 
           if (users.isEmpty) {
             return const Center(child: Text('No users found'));

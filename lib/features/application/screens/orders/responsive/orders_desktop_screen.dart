@@ -39,13 +39,13 @@ class OrdersDesktopScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (orderController.orders.isEmpty) {
+            if (orderController.filteredOrders.isEmpty) {
               return const Center(child: Text('No orders available.'));
             }
 
             return TabBarView(
               children: [
-                _buildOrderTable(context, orderController.orders), // All Orders
+                _buildOrderTable(context, orderController.filteredOrders), // All Orders
                 _buildOrderTable(context, orderController.getTodayOrders()), // Today's Orders
                 _buildOrderTable(context, orderController.getPastOrders()), // Past Orders
               ],

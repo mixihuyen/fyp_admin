@@ -41,7 +41,7 @@ class OrdersTabletMobileScreen extends StatelessWidget {
 
             return TabBarView(
               children: [
-                _buildOrderList(context, orderController.orders, "No orders available."), // All Orders
+                _buildOrderList(context, orderController.filteredOrders, "No orders available."), // All Orders
                 _buildOrderList(context, orderController.getTodayOrders(), "No orders available."), // Today's Orders
                 _buildOrderList(context, orderController.getPastOrders(), "No orders available."), // Past Orders
               ],
@@ -52,8 +52,8 @@ class OrdersTabletMobileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderList(BuildContext context, List<OrderModel> orders, String emptyMessage) {
-    if (orders.isEmpty) {
+  Widget _buildOrderList(BuildContext context, List<OrderModel> filteredOrders, String emptyMessage) {
+    if (filteredOrders.isEmpty) {
       return Center(
         child: Text(
           emptyMessage,
@@ -62,9 +62,9 @@ class OrdersTabletMobileScreen extends StatelessWidget {
       );
     }
     return ListView.builder(
-      itemCount: orders.length,
+      itemCount: filteredOrders.length,
       itemBuilder: (context, index) {
-        final order = orders[index];
+        final order = filteredOrders[index];
         return Card(
           child: ListTile(
             title: Text(order.id),

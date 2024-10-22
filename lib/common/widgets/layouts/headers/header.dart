@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fyp_admin_panel/common/widgets/images/t_rounded_image.dart';
 import 'package:fyp_admin_panel/common/widgets/shimmers/shimmer.dart';
 import 'package:fyp_admin_panel/features/application/controllers/category_controller.dart';
+import 'package:fyp_admin_panel/features/application/controllers/order_controller.dart';
 import 'package:fyp_admin_panel/features/application/controllers/station_controller.dart';
 import 'package:fyp_admin_panel/features/authentication/controllers/user_controller.dart';
 import 'package:fyp_admin_panel/utils/constants/enums.dart';
@@ -9,6 +10,7 @@ import 'package:fyp_admin_panel/utils/device/device_utility.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../../data/repositories/orders/order_repository.dart';
 import '../../../../features/application/controllers/province_controller.dart';
 import '../../../../utils/constants/colors.dart';
 import '../../../../utils/constants/image_strings.dart';
@@ -31,6 +33,7 @@ class _THeaderState extends State<THeader> {
   final StationController stationController = Get.put(StationController());
   final ProvinceController provinceController = Get.put(ProvinceController());
   final CategoryController categoryController = Get.put(CategoryController());
+  final OrderController orderController = Get.put(OrderController(orderRepository: OrderRepository()));
   bool isSearchExpanded = false; // State to manage the expanded search bar
   final TextEditingController searchController = TextEditingController();
 
@@ -64,7 +67,7 @@ class _THeaderState extends State<THeader> {
               stationController.searchStations(value);
               provinceController.searchProvinces(value);
               categoryController.searchCategories(value);
-              controller.updateSearchQuery(value);
+              orderController.updateSearchQuery(value);
             },
           ),
         )
@@ -90,7 +93,7 @@ class _THeaderState extends State<THeader> {
                           stationController.searchStations(value);
                           provinceController.searchProvinces(value);
                           categoryController.searchCategories(value);
-                          controller.updateSearchQuery(value);
+                          orderController.updateSearchQuery(value);
 
                         },
                       ),
@@ -105,7 +108,7 @@ class _THeaderState extends State<THeader> {
                           stationController.searchStations(''); // Reset search results
                           provinceController.searchProvinces('');
                           categoryController.searchCategories('');
-                          controller.updateSearchQuery('');
+                          orderController.updateSearchQuery('');
                         }
                       });
                     },

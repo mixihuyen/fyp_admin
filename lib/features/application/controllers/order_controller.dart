@@ -1,12 +1,15 @@
 import 'package:get/get.dart';
-
 import '../../../data/repositories/orders/order_repository.dart';
+import '../../../utils/formatters/formatter.dart';
+import '../../../utils/helpers/location_helper.dart';
 import '../../../utils/popups/loaders.dart';
 import '../models/orders_model.dart';
 
 class OrderController extends GetxController {
   var isLoading = true.obs;
   var orders = <OrderModel>[].obs;
+  var filteredOrders = <OrderModel>[].obs;
+  var searchQuery = ''.obs;
 
   final OrderRepository orderRepository;
 
@@ -16,6 +19,8 @@ class OrderController extends GetxController {
   void onInit() {
     super.onInit();
     loadAllOrdersFromAllUsers();
+    // Listen to changes in search query and trigger filtering
+    ever(searchQuery, (_) => filterOrders());
   }
 
   // Load all orders from Firestore
@@ -24,21 +29,69 @@ class OrderController extends GetxController {
       isLoading(true);
       final fetchedOrders = await orderRepository.fetchAllOrdersFromAllUsers();
 
-      // Sort the orders based on item.date, in ascending order
-      fetchedOrders.sort((a, b) {
-        // Assuming each order has multiple items, sort by the earliest item date
-        final aMinDate = a.items.map((item) => item.date).whereType<DateTime>().reduce((a, b) => a.isBefore(b) ? a : b);
-        final bMinDate = b.items.map((item) => item.date).whereType<DateTime>().reduce((a, b) => a.isBefore(b) ? a : b);
-        return aMinDate.compareTo(bMinDate);
-      });
+      if (fetchedOrders.isNotEmpty) {
+        // Sort the orders based on item.date, in ascending order
+        fetchedOrders.sort((a, b) {
+          final aMinDate = a.items.map((item) => item.date).whereType<DateTime>().reduce((a, b) => a.isBefore(b) ? a : b);
+          final bMinDate = b.items.map((item) => item.date).whereType<DateTime>().reduce((a, b) => a.isBefore(b) ? a : b);
+          return aMinDate.compareTo(bMinDate);
+        });
 
-      // Update the orders list after sorting
-      orders.value = fetchedOrders;
+        // Update both orders and filteredOrders lists
+        orders.assignAll(fetchedOrders); // Set fetched orders to the main list
+        filteredOrders.assignAll(fetchedOrders); // Initially show all orders in filteredOrders
+      } else {
+        orders.clear();
+        filteredOrders.clear();
+      }
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to load orders: ${e.toString()}');
     } finally {
       isLoading(false);
     }
+  }
+
+  // Filter orders based on the search query
+  void filterOrders() {
+    if (searchQuery.isEmpty) {
+      filteredOrders.assignAll(orders); // Show all orders if search query is empty
+    } else {
+      final query = searchQuery.value.toLowerCase();
+
+      filteredOrders.value = orders.where((order) {
+        // Search across all relevant fields
+        final matchesOrderId = order.id.toLowerCase().contains(query);
+        final matchesName = order.name.toLowerCase().contains(query);
+        final matchesPhoneNumber = order.phoneNumber.toLowerCase().contains(query);
+        final matchesTotalAmount = TFormatter.format(order.totalAmount).toLowerCase().contains(query);
+
+        // Check items in the order
+        final matchesItems = order.items.any((item) {
+          // Get the station names using LocationHelper
+          final startLocationName = LocationHelper.getStationName(item.start?.startLocation);
+          final endLocationName = LocationHelper.getStationName(item.end?.endLocation);
+
+          final quantity = item.quantity.toString();
+          final departureDate = TFormatter.formatDate(item.date).toLowerCase();
+
+          return startLocationName.toLowerCase().contains(query) ||
+              endLocationName.toLowerCase().contains(query) ||
+              quantity.contains(query) ||
+              departureDate.contains(query);
+        });
+
+        // Return true if any of the fields match
+        return matchesOrderId || matchesName || matchesPhoneNumber || matchesTotalAmount || matchesItems;
+      }).toList();
+    }
+  }
+
+
+
+  // Update search query
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
+    filterOrders();
   }
 
   List<OrderModel> getTodayOrders() {
@@ -53,14 +106,12 @@ class OrderController extends GetxController {
     final startOfToday = DateTime(today.year, today.month, today.day); // Ensure time component is excluded
 
     return orders.where((order) {
-      // Check if any item in the order has a date before today
       return order.items.any((item) =>
       item.date != null &&
           item.date!.isBefore(startOfToday) // Compare only the date, excluding time
       );
     }).toList();
   }
-
 
   bool isSameDay(DateTime? date1, DateTime date2) {
     if (date1 == null) return false;
