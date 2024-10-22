@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../../../data/repositories/trip/trip_responsitory.dart';
+import '../../../utils/popups/loaders.dart';
 import '../models/trip_model.dart';
 import '../models/station_model.dart';
 import '../models/category_model.dart';
@@ -63,12 +64,12 @@ class TripController extends GetxController {
   Future<void> addTrip(TripModel trip) async {
     try {
       await _tripRepository.addTripAndLinkToCategory(trip);
-      Get.snackbar('Success', 'Trip added successfully');
+      TLoaders.successSnackBar(title: 'Success', message: 'Trip added successfully');
 
       // Fetch trips again to reload the trip list with the new trip
       fetchTrips();
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add trip: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add trip: ${e.toString()}');
     }
   }
 
@@ -76,9 +77,10 @@ class TripController extends GetxController {
   Future<void> updateTrip(TripModel trip) async {
     try {
       await _tripRepository.updateTrip(trip);
+      TLoaders.successSnackBar(title: 'Success', message: 'Trip updated successfully');
       fetchTrips(); // Reload trips after update
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update trip: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to update trip: ${e.toString()}');
     }
   }
 
@@ -87,12 +89,12 @@ class TripController extends GetxController {
     try {
       // Delete the trip from Firestore based on its ID
       await _firestore.collection('Trips').doc(trip.id).delete();
-      Get.snackbar('Success', 'Trip deleted successfully');
+      TLoaders.successSnackBar(title: 'Success', message: 'Trip deleted successfully');
 
       // Fetch trips again to reload the updated list
       fetchTrips();
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete trip: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to delete trip: ${e.toString()}');
     }
   }
 

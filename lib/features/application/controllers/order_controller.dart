@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../../data/repositories/orders/order_repository.dart';
+import '../../../utils/popups/loaders.dart';
 import '../models/orders_model.dart';
 
 class OrderController extends GetxController {
@@ -34,7 +35,7 @@ class OrderController extends GetxController {
       // Update the orders list after sorting
       orders.value = fetchedOrders;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load orders: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to load orders: ${e.toString()}');
     } finally {
       isLoading(false);
     }

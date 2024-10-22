@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import '../../../utils/popups/loaders.dart';
 import '../models/station_model.dart';
 
 class StationController extends GetxController {
@@ -19,8 +20,9 @@ class StationController extends GetxController {
         'name': name,
       });
       stations.add(StationModel(id: docRef.id, name: name));
+      TLoaders.successSnackBar(title: 'Success', message: 'Station added successfully');
     } catch (e) {
-      print('Error adding station: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add station: ${e.toString()}');
     }
   }
 
@@ -35,9 +37,10 @@ class StationController extends GetxController {
       if (index != -1) {
         stations[index].name = newName;
         stations.refresh(); // Notify UI about the change
+        TLoaders.successSnackBar(title: 'Success', message: 'Station updated successfully');
       }
     } catch (e) {
-      print('Error updating station: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to update station: ${e.toString()}');
     }
   }
 
@@ -46,8 +49,9 @@ class StationController extends GetxController {
     try {
       await _firestore.collection('Station').doc(id).delete();
       stations.removeWhere((station) => station.id == id); // Remove from the local list
+      TLoaders.successSnackBar(title: 'Success', message: 'Station deleted successfully');
     } catch (e) {
-      print('Error deleting station: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to delete station: ${e.toString()}');
     }
   }
 

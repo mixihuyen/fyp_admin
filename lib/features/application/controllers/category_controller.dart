@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import '../../../utils/popups/loaders.dart';
 import '../models/category_model.dart';
 
 class CategoryController extends GetxController {
@@ -19,8 +20,9 @@ class CategoryController extends GetxController {
         'name': name,
       });
       categories.add(CategoryModel(id: docRef.id, name: name));
+      TLoaders.successSnackBar(title: 'Success', message: 'Category added successfully');
     } catch (e) {
-      print('Error adding category: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to adding category: ${e.toString()}');
     }
   }
 
@@ -35,9 +37,10 @@ class CategoryController extends GetxController {
       if (index != -1) {
         categories[index].name = newName;
         categories.refresh(); // Notify UI about the change
+        TLoaders.successSnackBar(title: 'Success', message: 'Category updated successfully');
       }
     } catch (e) {
-      print('Error updating category: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to updating category: ${e.toString()}');
     }
   }
 
@@ -46,8 +49,9 @@ class CategoryController extends GetxController {
     try {
       await _firestore.collection('Categories').doc(id).delete();
       categories.removeWhere((category) => category.id == id); // Remove from the local list
+      TLoaders.successSnackBar(title: 'Success', message: 'Category deleted successfully');
     } catch (e) {
-      print('Error deleting category: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to delete category: ${e.toString()}');
     }
   }
 
@@ -59,7 +63,7 @@ class CategoryController extends GetxController {
         return CategoryModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
     } catch (e) {
-      print('Error fetching categories: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Error fetching categories: ${e.toString()}');
     }
   }
 }

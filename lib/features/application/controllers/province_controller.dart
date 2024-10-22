@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import '../../../utils/popups/loaders.dart';
 import '../models/province_model.dart';
 
 class ProvinceController extends GetxController {
@@ -19,8 +20,9 @@ class ProvinceController extends GetxController {
         'name': name,
       });
       provinces.add(ProvinceModel(id: docRef.id, name: name));
+      TLoaders.successSnackBar(title: 'Success', message: 'Province added successfully');
     } catch (e) {
-      print('Error adding province: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add province: ${e.toString()}');
     }
   }
 
@@ -35,9 +37,10 @@ class ProvinceController extends GetxController {
       if (index != -1) {
         provinces[index].name = newName;
         provinces.refresh(); // Notify UI about the change
+        TLoaders.successSnackBar(title: 'Success', message: 'Province updated successfully');
       }
     } catch (e) {
-      print('Error updating province: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to update province: ${e.toString()}');
     }
   }
 
@@ -46,8 +49,9 @@ class ProvinceController extends GetxController {
     try {
       await _firestore.collection('Provinces').doc(id).delete();
       provinces.removeWhere((province) => province.id == id); // Remove from the local list
+      TLoaders.successSnackBar(title: 'Success', message: 'Province deleted successfully');
     } catch (e) {
-      print('Error deleting province: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to delete province: ${e.toString()}');
     }
   }
 
