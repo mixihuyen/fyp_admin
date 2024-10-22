@@ -4,6 +4,7 @@ import 'package:fyp_admin_panel/common/widgets/shimmers/shimmer.dart';
 import 'package:fyp_admin_panel/features/application/controllers/category_controller.dart';
 import 'package:fyp_admin_panel/features/application/controllers/order_controller.dart';
 import 'package:fyp_admin_panel/features/application/controllers/station_controller.dart';
+import 'package:fyp_admin_panel/features/application/controllers/trip_controller.dart';
 import 'package:fyp_admin_panel/features/authentication/controllers/user_controller.dart';
 import 'package:fyp_admin_panel/utils/constants/enums.dart';
 import 'package:fyp_admin_panel/utils/device/device_utility.dart';
@@ -30,6 +31,7 @@ class THeader extends StatefulWidget implements PreferredSizeWidget {
 
 class _THeaderState extends State<THeader> {
   final UserController controller = UserController.instance;
+  final TripController tripController = Get.put(TripController());
   final StationController stationController = Get.put(StationController());
   final ProvinceController provinceController = Get.put(ProvinceController());
   final CategoryController categoryController = Get.put(CategoryController());
@@ -64,6 +66,7 @@ class _THeaderState extends State<THeader> {
               hintText: 'Search anything...',
             ),
             onChanged: (value) {
+              tripController.updateSearchQuery(value);
               stationController.searchStations(value);
               provinceController.searchProvinces(value);
               categoryController.searchCategories(value);
@@ -90,6 +93,7 @@ class _THeaderState extends State<THeader> {
                           border: InputBorder.none,
                         ),
                         onChanged: (value) {
+                          tripController.updateSearchQuery(value);
                           stationController.searchStations(value);
                           provinceController.searchProvinces(value);
                           categoryController.searchCategories(value);
@@ -105,6 +109,7 @@ class _THeaderState extends State<THeader> {
                         isSearchExpanded = !isSearchExpanded; // Toggle search expansion
                         if (!isSearchExpanded) {
                           searchController.clear(); // Clear search when closing
+                          tripController.updateSearchQuery('');
                           stationController.searchStations(''); // Reset search results
                           provinceController.searchProvinces('');
                           categoryController.searchCategories('');

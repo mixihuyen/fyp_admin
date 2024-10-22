@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../../../data/repositories/trip/trip_responsitory.dart';
+import '../../../utils/formatters/formatter.dart';
 import '../../../utils/popups/loaders.dart';
 import '../models/trip_model.dart';
 import '../models/station_model.dart';
@@ -13,6 +14,9 @@ class TripController extends GetxController {
   var categories = <CategoryModel>[].obs;
   var provinces = <ProvinceModel>[].obs;
   var trips = <TripModel>[].obs;
+  var filteredTrips = <TripModel>[].obs; // List to store filtered trips
+  var searchQuery = ''.obs; // Search query
+
   final TripRepository _tripRepository = Get.put(TripRepository());
 
   @override
@@ -22,6 +26,9 @@ class TripController extends GetxController {
     fetchCategories();
     fetchProvinces();
     fetchTrips();
+
+    // Trigger filtering whenever the search query changes
+    ever(searchQuery, (_) => filterTrips());
   }
 
   // Fetch stations
@@ -65,9 +72,7 @@ class TripController extends GetxController {
     try {
       await _tripRepository.addTripAndLinkToCategory(trip);
       TLoaders.successSnackBar(title: 'Success', message: 'Trip added successfully');
-
-      // Fetch trips again to reload the trip list with the new trip
-      fetchTrips();
+      fetchTrips(); // Reload trips after adding a new one
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add trip: ${e.toString()}');
     }
@@ -78,7 +83,7 @@ class TripController extends GetxController {
     try {
       await _tripRepository.updateTrip(trip);
       TLoaders.successSnackBar(title: 'Success', message: 'Trip updated successfully');
-      fetchTrips(); // Reload trips after update
+      fetchTrips(); // Reload trips after updating
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to update trip: ${e.toString()}');
     }
@@ -87,12 +92,9 @@ class TripController extends GetxController {
   // Delete a trip
   Future<void> deleteTrip(TripModel trip) async {
     try {
-      // Delete the trip from Firestore based on its ID
       await _firestore.collection('Trips').doc(trip.id).delete();
       TLoaders.successSnackBar(title: 'Success', message: 'Trip deleted successfully');
-
-      // Fetch trips again to reload the updated list
-      fetchTrips();
+      fetchTrips(); // Reload trips after deleting
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to delete trip: ${e.toString()}');
     }
@@ -105,8 +107,60 @@ class TripController extends GetxController {
       trips.value = querySnapshot.docs.map((doc) {
         return TripModel.fromSnapshot(doc);
       }).toList();
+      filteredTrips.assignAll(trips); // Initially show all trips
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Error fetching trips: ${e.toString()}');
     }
+  }
+
+  // Filter trips based on search query
+  void filterTrips() {
+    if (searchQuery.isEmpty) {
+      filteredTrips.assignAll(trips); // If no search query, show all trips
+    } else {
+      final query = searchQuery.value.toLowerCase();
+
+      filteredTrips.value = trips.where((trip) {
+        // Match against various trip fields
+        final matchesStartProvince = _getProvinceName(trip.start?.startProvince).toLowerCase().contains(query);
+        final matchesEndProvince = _getProvinceName(trip.end?.endProvince).toLowerCase().contains(query);
+        final matchesStartStation = _getStationName(trip.start?.startLocation).toLowerCase().contains(query);
+        final matchesEndStation = _getStationName(trip.end?.endLocation).toLowerCase().contains(query);
+        final matchesCategory = _getCategoryName(trip.categoryId).toLowerCase().contains(query);
+
+        // Match departure and arrival times (now strings)
+        final matchesDepartureTime = (trip.start?.departureTime ?? '').toLowerCase().contains(query);
+        final matchesArrivalTime = (trip.end?.arrivalTime ?? '').toLowerCase().contains(query);
+
+        // Match trip price
+        final matchesPrice = TFormatter.format(trip.price).toLowerCase().contains(query);
+
+        // Return true if any of the fields match the query
+        return matchesStartProvince || matchesEndProvince || matchesStartStation || matchesEndStation ||
+            matchesCategory || matchesDepartureTime || matchesArrivalTime || matchesPrice;
+      }).toList();
+    }
+  }
+
+
+  // Helper methods to get names from IDs
+  String _getCategoryName(String? categoryId) {
+    final category = categories.firstWhereOrNull((category) => category.id == categoryId);
+    return category?.name ?? 'Unknown';
+  }
+
+  String _getProvinceName(String? provinceId) {
+    final province = provinces.firstWhereOrNull((province) => province.id == provinceId);
+    return province?.name ?? 'Unknown';
+  }
+
+  String _getStationName(String? stationId) {
+    final station = stations.firstWhereOrNull((station) => station.id == stationId);
+    return station?.name ?? 'Unknown';
+  }
+
+  // Update search query
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
   }
 }

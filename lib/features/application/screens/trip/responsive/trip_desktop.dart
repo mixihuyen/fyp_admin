@@ -56,7 +56,7 @@ class TripScreenDesktop extends StatelessWidget {
 
   Widget _buildTripTable(double maxWidth) {
     return Obx(() {
-      final trips = controller.trips;
+      final trips = controller.filteredTrips;
 
       if (trips.isEmpty) {
         return const Center(child: Text('No trips found.'));
