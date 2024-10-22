@@ -49,13 +49,13 @@ class ProvinceScreenMobile extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
               child: Obx(() {
-                if (controller.provinces.isEmpty) {
+                if (controller.filteredProvinces.isEmpty) {
                   return const Center(child: Text('No provinces found.'));
                 }
                 return ListView.builder(
-                  itemCount: controller.provinces.length,
+                  itemCount: controller.filteredProvinces.length,
                   itemBuilder: (context, index) {
-                    final province = controller.provinces[index];
+                    final province = controller.filteredProvinces[index];
                     return ListTile(
                       title: Text(province.name),
                     );

@@ -79,13 +79,13 @@ class CategoryWidgets extends StatelessWidget {
                   const SizedBox(height: 10),
                   Expanded(
                     child: Obx(() {
-                      if (controller.categories.isEmpty) {
+                      if (controller.filteredCategories.isEmpty) {
                         return const Text('No categories found.');
                       }
                       return ListView.builder(
-                        itemCount: controller.categories.length,
+                        itemCount: controller.filteredCategories.length,
                         itemBuilder: (context, index) {
-                          final category = controller.categories[index];
+                          final category = controller.filteredCategories[index];
                           return ListTile(
                             title: Text(category.name),
                             trailing: Row(
