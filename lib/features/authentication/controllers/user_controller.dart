@@ -8,7 +8,9 @@ class UserController extends GetxController {
 
   RxBool loading = false.obs; // Controls the loading state
   RxList<UserModel> users = <UserModel>[].obs; // List of all users
+  RxList<UserModel> filteredUsers = <UserModel>[].obs; // List of filtered users
   Rx<UserModel> user = UserModel.empty().obs;
+  RxString searchQuery = ''.obs; // Search query
 
   final UserRepository userRepository = Get.put(UserRepository()); // Instance of UserRepository
 
@@ -25,12 +27,39 @@ class UserController extends GetxController {
       loading.value = true; // Start loading
       final allUsers = await userRepository.fetchAllUsers(); // Fetch data from repository
       users.value = allUsers; // Update the observable list
+      filterUsers(); // Filter the users based on the search query
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: e.toString()); // Show error message
     } finally {
       loading.value = false; // Stop loading
     }
   }
+
+  // Filter users based on the search query
+  void filterUsers() {
+    if (searchQuery.value.isEmpty) {
+      filteredUsers.value = users; // Show all users if search query is empty
+    } else {
+      filteredUsers.value = users.where((user) {
+        final lowerQuery = searchQuery.value.toLowerCase();
+        return user.firstName.toLowerCase().contains(lowerQuery) ||
+            user.lastName.toLowerCase().contains(lowerQuery) ||
+            user.username.toLowerCase().contains(lowerQuery) ||
+            user.email.toLowerCase().contains(lowerQuery) ||
+            user.phoneNumber.toLowerCase().contains(lowerQuery) ||
+            user.role.name.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+  }
+
+  // Update search query
+  // UserController
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
+    filterUsers(); // Ensure filtering is triggered whenever query is updated
+  }
+
+
 
   Future<UserModel> fetchUserDetails() async {
     try {

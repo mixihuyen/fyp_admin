@@ -64,6 +64,7 @@ class _THeaderState extends State<THeader> {
               stationController.searchStations(value);
               provinceController.searchProvinces(value);
               categoryController.searchCategories(value);
+              controller.updateSearchQuery(value);
             },
           ),
         )
@@ -89,6 +90,7 @@ class _THeaderState extends State<THeader> {
                           stationController.searchStations(value);
                           provinceController.searchProvinces(value);
                           categoryController.searchCategories(value);
+                          controller.updateSearchQuery(value);
 
                         },
                       ),
@@ -103,6 +105,7 @@ class _THeaderState extends State<THeader> {
                           stationController.searchStations(''); // Reset search results
                           provinceController.searchProvinces('');
                           categoryController.searchCategories('');
+                          controller.updateSearchQuery('');
                         }
                       });
                     },

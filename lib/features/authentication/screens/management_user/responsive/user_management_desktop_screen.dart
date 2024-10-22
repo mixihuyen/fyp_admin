@@ -22,7 +22,7 @@ class UserManagementDesktopScreen extends StatelessWidget {
         }
 
         final users =
-            userController.users; // Lấy danh sách người dùng từ controller
+            userController.filteredUsers; // Lấy danh sách người dùng từ controller
 
         if (users.isEmpty) {
           return const Center(child: Text('No users found'));
