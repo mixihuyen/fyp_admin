@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../controllers/trip_controller.dart';
 import '../../../models/trip_model.dart';
@@ -304,11 +305,19 @@ class _AddTripPopupState extends State<AddTripPopup> {
                             labelStyle: smallTextStyle,
                           ),
                           keyboardType: TextInputType.number,
-                          validator: (value) => value!.isEmpty
-                              ? 'Please enter a price'
-                              : null,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter a price';
+                            }
+                            if (double.tryParse(value) == null) {
+                              return 'Please enter a valid number';
+                            }
+                            return null;
+                          },
                         ),
                       ),
+
                     ],
                   ),
                   const SizedBox(height: 20),

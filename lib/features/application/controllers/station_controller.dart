@@ -6,11 +6,14 @@ import '../models/station_model.dart';
 class StationController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   var stations = <StationModel>[].obs; // List to store stations
+  var filteredStations = <StationModel>[].obs; // List to store filtered stations for search
+  var searchQuery = ''.obs; // Observable for the search query
 
   @override
   void onInit() {
     super.onInit();
     fetchStations(); // Fetch stations when the controller is initialized
+    ever(searchQuery, (_) => filterStations()); // Listen to search query changes and filter stations
   }
 
   // Add a new station to Firestore
@@ -20,6 +23,7 @@ class StationController extends GetxController {
         'name': name,
       });
       stations.add(StationModel(id: docRef.id, name: name));
+      filteredStations.value = stations; // Update filtered list after adding
       TLoaders.successSnackBar(title: 'Success', message: 'Station added successfully');
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add station: ${e.toString()}');
@@ -32,11 +36,12 @@ class StationController extends GetxController {
       await _firestore.collection('Station').doc(id).update({
         'name': newName,
       });
-      // Update in the local list
+      // Update the local list
       int index = stations.indexWhere((station) => station.id == id);
       if (index != -1) {
         stations[index].name = newName;
         stations.refresh(); // Notify UI about the change
+        filteredStations.value = stations; // Update filtered list after updating
         TLoaders.successSnackBar(title: 'Success', message: 'Station updated successfully');
       }
     } catch (e) {
@@ -49,21 +54,39 @@ class StationController extends GetxController {
     try {
       await _firestore.collection('Station').doc(id).delete();
       stations.removeWhere((station) => station.id == id); // Remove from the local list
+      filteredStations.value = stations; // Update filtered list after deleting
       TLoaders.successSnackBar(title: 'Success', message: 'Station deleted successfully');
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to delete station: ${e.toString()}');
     }
   }
 
-  // Fetch station from Firestore
+  // Fetch stations from Firestore
   void fetchStations() async {
     try {
       QuerySnapshot querySnapshot = await _firestore.collection('Station').get();
       stations.value = querySnapshot.docs.map((doc) {
         return StationModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
+      filteredStations.value = stations; // Set initial filtered list to all stations
     } catch (e) {
       print('Error fetching stations: $e');
+    }
+  }
+
+  // Search stations based on the search query
+  void searchStations(String query) {
+    searchQuery.value = query; // Update search query
+  }
+
+  // Filter stations based on the search query
+  void filterStations() {
+    if (searchQuery.isEmpty) {
+      filteredStations.value = stations; // Show all stations if search query is empty
+    } else {
+      filteredStations.value = stations.where((station) {
+        return station.name.toLowerCase().contains(searchQuery.value.toLowerCase());
+      }).toList();
     }
   }
 }

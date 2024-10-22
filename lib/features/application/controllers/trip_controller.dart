@@ -106,7 +106,7 @@ class TripController extends GetxController {
         return TripModel.fromSnapshot(doc);
       }).toList();
     } catch (e) {
-      print('Error fetching trips: $e');
+      TLoaders.errorSnackBar(title: 'Error', message: 'Error fetching trips: ${e.toString()}');
     }
   }
 }

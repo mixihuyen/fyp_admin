@@ -66,7 +66,7 @@ class StationsWidgets extends StatelessWidget {
             ),
             const SizedBox(width: 20), // Khoảng cách giữa 2 phần
 
-            // Phần bên phải để hiển thị danh sách địa điểm
+            // Phần bên phải để hiển thị danh sách địa điểm và tìm kiếm
             Expanded(
               flex: 1, // Chia không gian: 2 phần cho phần danh sách
               child: Column(
@@ -81,13 +81,13 @@ class StationsWidgets extends StatelessWidget {
                   // Hiển thị danh sách các địa điểm đã thêm
                   Expanded(
                     child: Obx(() {
-                      if (controller.stations.isEmpty) {
+                      if (controller.filteredStations.isEmpty) {
                         return const Text('No stations found.');
                       }
                       return ListView.builder(
-                        itemCount: controller.stations.length,
+                        itemCount: controller.filteredStations.length,
                         itemBuilder: (context, index) {
-                          final station = controller.stations[index];
+                          final station = controller.filteredStations[index];
                           return ListTile(
                             title: Text(station.name),
                             trailing: Row(

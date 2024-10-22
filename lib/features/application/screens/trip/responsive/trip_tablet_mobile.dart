@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_admin_panel/features/application/screens/trip/widgets/add_trip_bottom_sheet.dart';
 import 'package:get/get.dart';
 import '../../../../../common/styles/shadows.dart';
 import '../../../../../common/widgets/icons/t_ticket_icon.dart';
@@ -20,20 +21,46 @@ class TripScreenTabletMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Obx(() {
-          if (controller.stations.isEmpty ||
-              controller.categories.isEmpty ||
-              controller.provinces.isEmpty ||
-              controller.trips.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        padding: const EdgeInsets.all(16.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Trips List',
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true, // Để cho phép điều chỉnh chiều cao của bottom sheet
+                          builder: (BuildContext dialogContext) {
+                            return const AddTripBottomSheet(); // Sử dụng bottom sheet để thêm chuyến đi mới
+                          },
+                        );
+                      },
+                    ),
 
-          // Hiển thị danh sách chuyến đi dưới dạng thẻ
-          return _buildTripCards(context);
-        }),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: _buildTripCards(context),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
+
   }
 
   // Bố cục thẻ (Card) cho các chuyến đi
@@ -130,14 +157,16 @@ class TripScreenTabletMobile extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
-                              showDialog(
+                              showModalBottomSheet(
                                 context: context,
+                                isScrollControlled: true, // Để cho phép điều chỉnh chiều cao của bottom sheet
                                 builder: (BuildContext dialogContext) {
-                                  return AddTripPopup(trip: trip); // Chỉnh sửa chuyến đi
+                                  return AddTripBottomSheet(trip: trip); // Sử dụng bottom sheet để chỉnh sửa chuyến đi
                                 },
                               );
                             },
                           ),
+
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {

@@ -1,103 +1,157 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_admin_panel/common/widgets/images/t_rounded_image.dart';
 import 'package:fyp_admin_panel/common/widgets/shimmers/shimmer.dart';
+import 'package:fyp_admin_panel/features/application/controllers/station_controller.dart';
 import 'package:fyp_admin_panel/features/authentication/controllers/user_controller.dart';
 import 'package:fyp_admin_panel/utils/constants/enums.dart';
 import 'package:fyp_admin_panel/utils/device/device_utility.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../../utils/constants/colors.dart';
 import '../../../../utils/constants/image_strings.dart';
 import '../../../../utils/constants/sizes.dart';
 
-class THeader extends StatelessWidget implements PreferredSizeWidget {
+class THeader extends StatefulWidget implements PreferredSizeWidget {
   const THeader({super.key, this.scaffoldKey});
 
   final GlobalKey<ScaffoldState>? scaffoldKey;
 
   @override
-  Widget build(BuildContext context) {
-    final controller = UserController.instance;
+  Size get preferredSize => Size.fromHeight(TDeviceUtils.getAppBarHeight() + 15);
 
+  @override
+  _THeaderState createState() => _THeaderState();
+}
+
+class _THeaderState extends State<THeader> {
+  final UserController controller = UserController.instance;
+  final StationController stationController = Get.put(StationController());
+  bool isSearchExpanded = false; // State to manage the expanded search bar
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         color: TColors.white,
         border: Border(bottom: BorderSide(color: TColors.grey, width: 1)),
       ),
-      padding: const EdgeInsets.symmetric(
-          horizontal: TSizes.md, vertical: TSizes.sm),
+      padding: const EdgeInsets.symmetric(horizontal: TSizes.md, vertical: TSizes.sm),
       child: AppBar(
-        //Mobile Menu
+        // Mobile Menu Icon
         leading: !TDeviceUtils.isDesktopScreen(context)
             ? IconButton(
-                onPressed: () => scaffoldKey?.currentState?.openDrawer(),
-                icon: const Icon(Iconsax.menu))
+          onPressed: () => widget.scaffoldKey?.currentState?.openDrawer(),
+          icon: const Icon(Iconsax.menu),
+        )
             : null,
 
-        // Search Field
+        // Search Field for Desktop
         title: TDeviceUtils.isDesktopScreen(context)
             ? SizedBox(
-                width: 400,
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      prefixIcon: Icon(Iconsax.search_normal),
-                      hintText: 'Search anything...'),
-                ),
-              )
+          width: 400,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Iconsax.search_normal),
+              hintText: 'Search anything...',
+            ),
+            onChanged: (value) {
+              stationController.searchStations(value); // Call search function
+            },
+          ),
+        )
             : null,
 
         actions: [
-          //Search
+          // Search Icon for Mobile
           if (!TDeviceUtils.isDesktopScreen(context))
-            IconButton(
-                onPressed: () {}, icon: const Icon(Iconsax.search_normal)),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: isSearchExpanded ? 220 : 40, // Expand or contract based on state
+              child: Row(
+                children: [
+                  if (isSearchExpanded)
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        decoration: const InputDecoration(
+                          hintText: 'Search...',
+                          border: InputBorder.none,
+                        ),
+                        onChanged: (value) {
+                          stationController.searchStations(value);
+                        },
+                      ),
+                    ),
+                  IconButton(
+                    icon: const Icon(Iconsax.search_normal),
+                    onPressed: () {
+                      setState(() {
+                        isSearchExpanded = !isSearchExpanded; // Toggle search expansion
+                        if (!isSearchExpanded) {
+                          searchController.clear(); // Clear search when closing
+                          stationController.searchStations(''); // Reset search results
+                        }
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
 
-          //Notification
-          IconButton(onPressed: () {}, icon: const Icon(Iconsax.notification)),
+          // Notification Icon
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Iconsax.notification),
+          ),
           const SizedBox(width: TSizes.spaceBtwItems / 2),
 
-          //User data
+          // User Data Section
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // image
+              // User Profile Image
               Obx(
-                () => TRoundedImage(
-                    width: 40,
-                    padding: 2,
-                    height: 40,
-                    imageType: controller.user.value.profilePicture.isNotEmpty ? ImageType.network : ImageType.asset,
-                    image: controller.user.value.profilePicture.isNotEmpty ? controller.user.value.profilePicture : TImages.user,
+                    () => TRoundedImage(
+                  width: 40,
+                  padding: 2,
+                  height: 40,
+                  imageType: controller.user.value.profilePicture.isNotEmpty
+                      ? ImageType.network
+                      : ImageType.asset,
+                  image: controller.user.value.profilePicture.isNotEmpty
+                      ? controller.user.value.profilePicture
+                      : TImages.user,
                 ),
               ),
               const SizedBox(width: TSizes.sm),
-              //Name and email
+              // User Name and Email for Desktop
               if (!TDeviceUtils.isMobileScreen(context))
                 Obx(
-                  () => Column(
+                      () => Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       controller.loading.value
                           ? const TShimmerEffect(width: 50, height: 13)
-                          : Text(controller.user.value.fullName, style: Theme.of(context).textTheme.titleLarge),
+                          : Text(
+                        controller.user.value.fullName,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       controller.loading.value
                           ? const TShimmerEffect(width: 50, height: 13)
-                          : Text(controller.user.value.email, style: Theme.of(context).textTheme.labelMedium),
+                          : Text(
+                        controller.user.value.email,
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
                     ],
                   ),
-                )
+                ),
             ],
-          )
+          ),
         ],
       ),
     );
   }
-
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize =>
-      Size.fromHeight(TDeviceUtils.getAppBarHeight() + 15);
 }

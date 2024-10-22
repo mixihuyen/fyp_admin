@@ -9,30 +9,30 @@ class StationScreenMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(StationController());
     final TextEditingController nameController = TextEditingController();
+    final TextEditingController searchController = TextEditingController();
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(12.0), // Padding nhỏ hơn cho mobile
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                // Đặt TextField bên trong Expanded để chiếm khoảng trống còn lại
                 Expanded(
                   child: TextField(
                     controller: nameController,
                     decoration: const InputDecoration(
                       labelText: 'Enter Station Name',
-                      border: OutlineInputBorder(), // Thêm border cho TextField
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10), // Khoảng cách nhỏ hơn giữa TextField và nút
+                const SizedBox(width: 10),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0), // Điều chỉnh padding cho nút
-                    minimumSize: const Size(50, 48), // Điều chỉnh kích thước tối thiểu của nút
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    minimumSize: const Size(50, 48),
                   ),
                   onPressed: () {
                     if (nameController.text.isNotEmpty) {
@@ -56,13 +56,13 @@ class StationScreenMobile extends StatelessWidget {
             // Hiển thị danh sách các trạm đã thêm
             Expanded(
               child: Obx(() {
-                if (controller.stations.isEmpty) {
+                if (controller.filteredStations.isEmpty) {
                   return const Center(child: Text('No stations found.'));
                 }
                 return ListView.builder(
-                  itemCount: controller.stations.length,
+                  itemCount: controller.filteredStations.length,
                   itemBuilder: (context, index) {
-                    final station = controller.stations[index];
+                    final station = controller.filteredStations[index];
                     return ListTile(
                       title: Text(station.name),
                       trailing: Row(
@@ -71,7 +71,6 @@ class StationScreenMobile extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
-                              // Gọi Popup chỉnh sửa ở đây
                               _showEditDialog(context, controller, station);
                             },
                           ),
