@@ -14,43 +14,66 @@ class UserManagementDesktopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Obx(() {
-          if (userController.loading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        body: Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Obx(() {
+        if (userController.loading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          final users = userController.users; // Lấy danh sách người dùng từ controller
+        final users =
+            userController.users; // Lấy danh sách người dùng từ controller
 
-          if (users.isEmpty) {
-            return const Center(child: Text('No users found'));
-          }
+        if (users.isEmpty) {
+          return const Center(child: Text('No users found'));
+        }
 
-          return SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: SingleChildScrollView(
+        return LayoutBuilder(builder: (context, constraints) {
+          // Adjust font size and column spacing based on screen width
+          double fontSize = constraints.maxWidth < 500 ? 10 : 12;
+          double columnSpacing = constraints.maxWidth < 500 ? 10 : 20;
+          double dataRowHeight = constraints.maxWidth < 500 ? 30 : 35;
+          double headingRowHeight = constraints.maxWidth < 500 ? 35 : 40;
+
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'User Management',
+                style: TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: 24, // Increase column spacing
-                headingRowHeight: 40,
-                dataRowHeight: 60,
-                columns: const [
-                  DataColumn(label: Text('First Name')),
-                  DataColumn(label: Text('Last Name')),
-                  DataColumn(label: Text('Username')),
-                  DataColumn(label: Text('Email')),
-                  DataColumn(label: Text('Phone')),
-                  DataColumn(label: Text('Role')),
-                  DataColumn(label: Text('Actions')),
-                ],
-                rows: users.map((user) => _buildDataRow(user, context)).toList(),
+              // Enable horizontal scrolling if necessary
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: constraints.maxWidth, // Make the table responsive
+                ),
+                child: DataTable(
+                  columnSpacing: columnSpacing,
+                  // Adjust column spacing based on screen width
+                  headingRowHeight: headingRowHeight,
+                  dataRowHeight: dataRowHeight,
+                  columns: const [
+                    DataColumn(label: Text('First Name')),
+                    DataColumn(label: Text('Last Name')),
+                    DataColumn(label: Text('Username')),
+                    DataColumn(label: Text('Email')),
+                    DataColumn(label: Text('Phone')),
+                    DataColumn(label: Text('Role')),
+                    DataColumn(label: Text('Actions')),
+                  ],
+                  rows:
+                      users.map((user) => _buildDataRow(user, context)).toList(),
+                ),
               ),
             ),
-          );
-        }),
-      ),
-    );
+          ]);
+        });
+      }),
+    ));
   }
 
   DataRow _buildDataRow(UserModel user, BuildContext context) {
@@ -58,12 +81,18 @@ class UserManagementDesktopScreen extends StatelessWidget {
 
     return DataRow(
       cells: [
-        DataCell(Text(TFormatter.formatCellValue(user.firstName), style: textStyle)),
-        DataCell(Text(TFormatter.formatCellValue(user.lastName), style: textStyle)),
-        DataCell(Text(TFormatter.formatCellValue(user.username), style: textStyle)),
-        DataCell(Text(TFormatter.formatCellValue(user.email), style: textStyle)),
-        DataCell(Text(TFormatter.formatCellValue(user.phoneNumber), style: textStyle)),
-        DataCell(Text(TFormatter.formatCellValue(user.role.name), style: textStyle)),
+        DataCell(
+            Text(TFormatter.formatCellValue(user.firstName), style: textStyle)),
+        DataCell(
+            Text(TFormatter.formatCellValue(user.lastName), style: textStyle)),
+        DataCell(
+            Text(TFormatter.formatCellValue(user.username), style: textStyle)),
+        DataCell(
+            Text(TFormatter.formatCellValue(user.email), style: textStyle)),
+        DataCell(Text(TFormatter.formatCellValue(user.phoneNumber),
+            style: textStyle)),
+        DataCell(
+            Text(TFormatter.formatCellValue(user.role.name), style: textStyle)),
         DataCell(
           Row(
             children: [
@@ -116,9 +145,12 @@ class UserManagementDesktopScreen extends StatelessWidget {
 
   // Define the _showEditUserDialog method
   void _showEditUserDialog(BuildContext context, UserModel user) {
-    final TextEditingController firstNameController = TextEditingController(text: user.firstName);
-    final TextEditingController lastNameController = TextEditingController(text: user.lastName);
-    final TextEditingController emailController = TextEditingController(text: user.email);
+    final TextEditingController firstNameController =
+        TextEditingController(text: user.firstName);
+    final TextEditingController lastNameController =
+        TextEditingController(text: user.lastName);
+    final TextEditingController emailController =
+        TextEditingController(text: user.email);
 
     showDialog(
       context: context,

@@ -30,18 +30,41 @@ class TripRepository extends GetxController {
     }
   }
 
-  // Update an existing trip in Firestore
   Future<void> updateTrip(TripModel trip) async {
     try {
-      // Use the trip id to update the trip in Firestore
+      // Cập nhật chuyến đi trong 'Trips'
       await _db.collection('Trips').doc(trip.id).update(trip.toJson());
-      Get.snackbar('Success', 'Trip updated successfully');
+
+      // Kiểm tra xem categoryId có thay đổi không
+      DocumentSnapshot tripCategorySnapshot = await _db
+          .collection('TripCategory')
+          .where('tripId', isEqualTo: trip.id)
+          .limit(1) // Giả sử mỗi trip chỉ có một category
+          .get()
+          .then((querySnapshot) => querySnapshot.docs.first);
+
+      String currentCategoryId = tripCategorySnapshot['categoryId'];
+
+      if (trip.categoryId != currentCategoryId) {
+        // Nếu categoryId thay đổi, cập nhật liên kết trong 'TripCategory'
+
+        // Xóa liên kết cũ
+        await _db.collection('TripCategory').doc(tripCategorySnapshot.id).delete();
+
+        // Thêm liên kết mới
+        if (trip.categoryId != null && trip.categoryId!.isNotEmpty) {
+          await _db.collection('TripCategory').add({
+            'tripId': trip.id,
+            'categoryId': trip.categoryId,
+          });
+        }
+      }
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Something went wrong while updating the trip: $e';
+      throw 'Something went wrong while updating the trip and category: $e';
     }
   }
 }

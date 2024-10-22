@@ -15,15 +15,7 @@ class TripScreenDesktop extends StatelessWidget {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(32.0),
-        child: Obx(() {
-          if (controller.stations.isEmpty ||
-              controller.categories.isEmpty ||
-              controller.provinces.isEmpty ||
-              controller.trips.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return LayoutBuilder(
+        child: LayoutBuilder(
             builder: (context, constraints) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -33,7 +25,8 @@ class TripScreenDesktop extends StatelessWidget {
                     children: [
                       const Text(
                         'Trips List',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
@@ -55,10 +48,10 @@ class TripScreenDesktop extends StatelessWidget {
                 ],
               );
             },
-          );
-        }),
-      ),
-    );
+          ),
+        ),
+      );
+
   }
 
   Widget _buildTripTable(double maxWidth) {
@@ -88,7 +81,8 @@ class TripScreenDesktop extends StatelessWidget {
               DataColumn(label: Text('Departure')),
               DataColumn(label: Text('Arrival')),
               DataColumn(label: Text('Price')),
-              DataColumn(label: Text('Actions')), // New column for Edit/Delete buttons
+              DataColumn(label: Text('Actions')),
+              // New column for Edit/Delete buttons
             ],
             rows: trips.map((trip) {
               return DataRow(
@@ -112,7 +106,9 @@ class TripScreenDesktop extends StatelessWidget {
                                 showDialog(
                                   context: newContext,
                                   builder: (BuildContext dialogContext) {
-                                    return AddTripPopup(trip: trip); // Truyền chuyến đi cần chỉnh sửa
+                                    return AddTripPopup(
+                                        trip:
+                                            trip); // Truyền chuyến đi cần chỉnh sửa
                                   },
                                 );
                               },
@@ -120,7 +116,8 @@ class TripScreenDesktop extends StatelessWidget {
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () {
-                                _showDeleteConfirmation(newContext, trip); // Hiển thị xác nhận xóa
+                                _showDeleteConfirmation(
+                                    newContext, trip); // Hiển thị xác nhận xóa
                               },
                             ),
                           ],
@@ -139,21 +136,21 @@ class TripScreenDesktop extends StatelessWidget {
 
   String _getCategoryName(String? categoryId) {
     final category = controller.categories.firstWhereOrNull(
-          (category) => category.id == categoryId,
+      (category) => category.id == categoryId,
     );
     return category?.name ?? 'Unknown';
   }
 
   String _getProvinceName(String? provinceId) {
     final province = controller.provinces.firstWhereOrNull(
-          (province) => province.id == provinceId,
+      (province) => province.id == provinceId,
     );
     return province?.name ?? 'Unknown';
   }
 
   String _getStationName(String? stationId) {
     final station = controller.stations.firstWhereOrNull(
-          (station) => station.id == stationId,
+      (station) => station.id == stationId,
     );
     return station?.name ?? 'Unknown';
   }
@@ -184,6 +181,4 @@ class TripScreenDesktop extends StatelessWidget {
       },
     );
   }
-
-
 }

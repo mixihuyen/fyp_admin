@@ -11,6 +11,7 @@ class SidebarController extends GetxController {
   void changeHoverItem(String route) {
     if(!isActive(route)) hoverItem.value = route;
   }
+
   bool isActive(String route) => activeItem.value == route;
   bool isHovering(String route) => hoverItem.value == route;
 
@@ -18,9 +19,12 @@ class SidebarController extends GetxController {
     if(!isActive(route)){
       changeActiveItem(route);
 
-      if(TDeviceUtils.isMobileScreen(Get.context!)) Get.back();
-      Get.toNamed(route);
+      if(TDeviceUtils.isMobileScreen(Get.context!)) {
+        Get.back();  // Đóng sidebar nếu trên thiết bị di động
+      }
+
+      // Điều hướng và reload trang
+      Get.offAllNamed(route); // Sử dụng offAllNamed để xóa route cũ và reload trang
     }
   }
-
 }

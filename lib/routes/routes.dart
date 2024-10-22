@@ -7,7 +7,7 @@ class TRoutes {
   static const station = '/station';
   static const province = '/province';
   static const trip = '/trip';
-  static const booking = '/booking';
+  static const orders = '/orders';
   static const categories = '/categories';
   static const userManagement= '/userManagement';
   static const customer = '/customer';
@@ -19,6 +19,7 @@ class TRoutes {
     categories,
     province,
     userManagement,
+    orders,
   ];
 
 }
