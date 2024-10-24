@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../../../data/repositories/trip/trip_responsitory.dart';
 import '../../../utils/formatters/formatter.dart';
+import '../../../utils/helpers/location_helper.dart';
 import '../../../utils/popups/loaders.dart';
 import '../models/trip_model.dart';
 import '../models/station_model.dart';
@@ -146,11 +147,11 @@ class TripController extends GetxController {
 
       filteredTrips.value = trips.where((trip) {
         // Match against various trip fields
-        final matchesStartProvince = _getProvinceName(trip.start?.startProvince).toLowerCase().contains(query);
-        final matchesEndProvince = _getProvinceName(trip.end?.endProvince).toLowerCase().contains(query);
-        final matchesStartStation = _getStationName(trip.start?.startLocation).toLowerCase().contains(query);
-        final matchesEndStation = _getStationName(trip.end?.endLocation).toLowerCase().contains(query);
-        final matchesCategory = _getCategoryName(trip.categoryId).toLowerCase().contains(query);
+        final matchesStartProvince = LocationHelper.getProvinceName(trip.start?.startProvince).toLowerCase().contains(query);
+        final matchesEndProvince = LocationHelper.getProvinceName(trip.end?.endProvince).toLowerCase().contains(query);
+        final matchesStartStation = LocationHelper.getStationName(trip.start?.startLocation).toLowerCase().contains(query);
+        final matchesEndStation = LocationHelper.getStationName(trip.end?.endLocation).toLowerCase().contains(query);
+        final matchesCategory = LocationHelper.getCategoryName(trip.categoryId).toLowerCase().contains(query);
 
         // Match departure and arrival times
         final matchesDepartureTime = (trip.start?.departureTime ?? '').toLowerCase().contains(query);
@@ -166,24 +167,22 @@ class TripController extends GetxController {
     }
   }
 
-  // Helper methods to get names from IDs
-  String _getCategoryName(String? categoryId) {
-    final category = categories.firstWhereOrNull((category) => category.id == categoryId);
-    return category?.name ?? 'Unknown';
-  }
-
-  String _getProvinceName(String? provinceId) {
-    final province = provinces.firstWhereOrNull((province) => province.id == provinceId);
-    return province?.name ?? 'Unknown';
-  }
-
-  String _getStationName(String? stationId) {
-    final station = stations.firstWhereOrNull((station) => station.id == stationId);
-    return station?.name ?? 'Unknown';
-  }
 
   // Update search query
   void updateSearchQuery(String query) {
     searchQuery.value = query;
+  }
+  void filter({String? selectedStartStation, String? selectedEndStation}) {
+    if (selectedStartStation == null && selectedEndStation == null) {
+      // If no station filters are provided, show all trips
+      filteredTrips.assignAll(trips);
+    } else {
+      // Filter trips based on the selected start and end stations
+      filteredTrips.value = trips.where((trip) {
+        final matchesStart = selectedStartStation == null || trip.start?.startLocation == selectedStartStation;
+        final matchesEnd = selectedEndStation == null || trip.end?.endLocation == selectedEndStation;
+        return matchesStart && matchesEnd;
+      }).toList();
+    }
   }
 }

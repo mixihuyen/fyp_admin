@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_admin_panel/features/application/screens/trip/widgets/add_trip_bottom_sheet.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../../../common/styles/shadows.dart';
 import '../../../../../common/widgets/icons/t_ticket_icon.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/sizes.dart';
 import '../../../../../utils/formatters/formatter.dart';
 import '../../../../../utils/helpers/helper_functions.dart';
+import '../../../../../utils/helpers/location_helper.dart';
 import '../../../controllers/trip_controller.dart';
 import '../../../models/trip_model.dart';
 import '../widgets/add_trip_popup.dart';
+import '../widgets/search_trip.dart';
 import '../widgets/t_ticket_time_location.dart';
 
 class TripScreenTabletMobile extends StatelessWidget {
@@ -27,6 +30,24 @@ class TripScreenTabletMobile extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      icon: const Icon(Icons.layers, color: Colors.red), // Set the icon color
+                      label: const Text('Filter', style: TextStyle(color: Colors.red)), // Set the text color
+                      onPressed: () => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) => const SearchTrip(),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red, // Button text and icon color
+                      ),
+                    ),
+                  ],
+                ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -68,11 +89,40 @@ class TripScreenTabletMobile extends StatelessWidget {
   Widget _buildTripCards(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
     return Obx(() {
-      final trips = controller.trips;
+      final trips = controller.filteredTrips;
 
       if (trips.isEmpty) {
-        return const Center(child: Text('No trips found.'));
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon or Image
+              const Icon(
+                Icons.search_off,
+                size: 80,
+                color: Colors.grey, // You can change this to suit your theme
+              ),
+              const SizedBox(height: 16),
+
+              // Text for no trips found
+              Text(
+                'No trips match.',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Suggestion text
+              Text(
+                'Can you try turning off the filter and searching again?',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
       }
+
 
       return ListView.builder(
         itemCount: trips.length,
@@ -97,7 +147,7 @@ class TripScreenTabletMobile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// -- Title
-                  Text('${_getProvinceName(trip.start?.startProvince)} → ${_getProvinceName(trip.end?.endProvince)}',
+                  Text('${LocationHelper.getProvinceName(trip.start?.startProvince)} → ${LocationHelper.getProvinceName(trip.end?.endProvince)}',
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: TSizes.spaceBtwItems),
 
@@ -121,14 +171,14 @@ class TripScreenTabletMobile extends StatelessWidget {
                               time: trip.start != null
                                   ? trip.start!.departureTime
                                   : '',
-                              location: _getStationName(trip.start?.startLocation) ?? '',
-                              province: _getProvinceName(trip.start?.startProvince)  ?? '',
+                              location: LocationHelper.getStationName(trip.start?.startLocation) ?? '',
+                              province: LocationHelper.getProvinceName(trip.start?.startProvince)  ?? '',
                             ),
                             const SizedBox(height: TSizes.spaceBtwItems),
                             TicketTimeLocation(
                               time: trip.end != null ? trip.end!.arrivalTime : '',
-                              location: _getStationName(trip.end?.endLocation) ?? '',
-                              province: _getProvinceName(trip.end?.endProvince) ?? '',
+                              location: LocationHelper.getStationName(trip.end?.endLocation) ?? '',
+                              province: LocationHelper.getProvinceName(trip.end?.endProvince) ?? '',
                             )
                           ],
                         ),
@@ -146,7 +196,7 @@ class TripScreenTabletMobile extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Category: ${_getCategoryName(trip.categoryId)}' ?? 'Unknown Category'),
+                          Text('Category: ${LocationHelper.getCategoryName(trip.categoryId)}' ?? 'Unknown Category'),
                           Text('Price:  ${TFormatter.format(trip.price)}'),
                         ],
                       ),
@@ -185,27 +235,6 @@ class TripScreenTabletMobile extends StatelessWidget {
         },
       );
     });
-  }
-
-  String _getCategoryName(String? categoryId) {
-    final category = controller.categories.firstWhereOrNull(
-          (category) => category.id == categoryId,
-    );
-    return category?.name ?? 'Unknown';
-  }
-
-  String _getProvinceName(String? provinceId) {
-    final province = controller.provinces.firstWhereOrNull(
-          (province) => province.id == provinceId,
-    );
-    return province?.name ?? 'Unknown';
-  }
-
-  String _getStationName(String? stationId) {
-    final station = controller.stations.firstWhereOrNull(
-          (station) => station.id == stationId,
-    );
-    return station?.name ?? 'Unknown';
   }
 
   void _showDeleteConfirmation(BuildContext context, TripModel trip) {

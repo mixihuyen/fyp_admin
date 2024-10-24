@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../utils/formatters/formatter.dart';
+import '../../../../../utils/helpers/location_helper.dart';
 import '../../../controllers/trip_controller.dart';
 import '../../../models/trip_model.dart';
 import '../widgets/add_trip_popup.dart';
 
-class TripScreenDesktop extends StatelessWidget {
+class TripScreenDesktop extends StatefulWidget {
   TripScreenDesktop({super.key});
 
+  @override
+  _TripScreenDesktopState createState() => _TripScreenDesktopState();
+}
+
+class _TripScreenDesktopState extends State<TripScreenDesktop> {
   final TripController controller = Get.put(TripController());
+  String? selectedStartStation;
+  String? selectedEndStation;
 
   @override
   Widget build(BuildContext context) {
@@ -16,44 +24,117 @@ class TripScreenDesktop extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Trips List',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () async {
-                          await controller.fetchStations();
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const AddTripPopup();
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: _buildTripTable(constraints.maxWidth),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      );
+          builder: (context, constraints) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Trips List',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () async {
+                        await controller.fetchStations();
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const AddTripPopup();
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
 
+                // Filter Section
+                Row(
+                  children: [
+                    Expanded(
+                      child: Obx(() {
+                        if (controller.stations.isEmpty) {
+                          return const CircularProgressIndicator();
+                        }
+                        return DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(labelText: 'Start Station'),
+                          value: selectedStartStation,
+                          items: controller.stations.map((station) {
+                            return DropdownMenuItem(
+                              value: station.id,
+                              child: Text(
+                                  '${LocationHelper.getStationName(station.id)} (${LocationHelper.getProvinceName(station.provinceId)})'),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedStartStation = value;
+                              // Call the new filter method
+                              controller.filter(selectedStartStation: selectedStartStation, selectedEndStation: selectedEndStation);
+                            });
+                          },
+                        );
+                      }),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Obx(() {
+                        if (controller.stations.isEmpty) {
+                          return const CircularProgressIndicator();
+                        }
+                        return DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(labelText: 'End Station'),
+                          value: selectedEndStation,
+                          items: controller.stations.map((station) {
+                            return DropdownMenuItem(
+                              value: station.id,
+                              child: Text(
+                                  '${LocationHelper.getStationName(station.id)} (${LocationHelper.getProvinceName(station.provinceId)})'),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedEndStation = value;
+                              // Call the new filter method
+                              controller.filter(selectedStartStation: selectedStartStation, selectedEndStation: selectedEndStation);
+                            });
+                          },
+                        );
+                      }),
+                    ),
+
+                    // Clear Filter Button
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Reset filters
+                        setState(() {
+                          selectedStartStation = null;
+                          selectedEndStation = null;
+                        });
+                        // Call the filter method with no filters
+                        controller.filter(selectedStartStation: null, selectedEndStation: null);
+                      },
+                      child: const Text('Clear'),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+                Expanded(
+                  child: _buildTripTable(constraints.maxWidth),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
+
 
   Widget _buildTripTable(double maxWidth) {
     return Obx(() {
@@ -83,16 +164,15 @@ class TripScreenDesktop extends StatelessWidget {
               DataColumn(label: Text('Arrival')),
               DataColumn(label: Text('Price')),
               DataColumn(label: Text('Actions')),
-              // New column for Edit/Delete buttons
             ],
             rows: trips.map((trip) {
               return DataRow(
                 cells: [
-                  DataCell(Text(_getProvinceName(trip.start?.startProvince))),
-                  DataCell(Text(_getStationName(trip.start?.startLocation))),
-                  DataCell(Text(_getProvinceName(trip.end?.endProvince))),
-                  DataCell(Text(_getStationName(trip.end?.endLocation))),
-                  DataCell(Text(_getCategoryName(trip.categoryId))),
+                  DataCell(Text(LocationHelper.getProvinceName(trip.start?.startProvince))),
+                  DataCell(Text(LocationHelper.getStationName(trip.start?.startLocation))),
+                  DataCell(Text(LocationHelper.getProvinceName(trip.end?.endProvince))),
+                  DataCell(Text(LocationHelper.getStationName(trip.end?.endLocation))),
+                  DataCell(Text(LocationHelper.getCategoryName(trip.categoryId))),
                   DataCell(Text(trip.start?.departureTime ?? 'Unknown')),
                   DataCell(Text(trip.end?.arrivalTime ?? 'Unknown')),
                   DataCell(Text(TFormatter.format(trip.price))),
@@ -107,9 +187,7 @@ class TripScreenDesktop extends StatelessWidget {
                                 showDialog(
                                   context: newContext,
                                   builder: (BuildContext dialogContext) {
-                                    return AddTripPopup(
-                                        trip:
-                                            trip); // Truyền chuyến đi cần chỉnh sửa
+                                    return AddTripPopup(trip: trip); // Pass trip for editing
                                   },
                                 );
                               },
@@ -117,8 +195,7 @@ class TripScreenDesktop extends StatelessWidget {
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () {
-                                _showDeleteConfirmation(
-                                    newContext, trip); // Hiển thị xác nhận xóa
+                                _showDeleteConfirmation(newContext, trip);
                               },
                             ),
                           ],
@@ -135,27 +212,6 @@ class TripScreenDesktop extends StatelessWidget {
     });
   }
 
-  String _getCategoryName(String? categoryId) {
-    final category = controller.categories.firstWhereOrNull(
-      (category) => category.id == categoryId,
-    );
-    return category?.name ?? 'Unknown';
-  }
-
-  String _getProvinceName(String? provinceId) {
-    final province = controller.provinces.firstWhereOrNull(
-      (province) => province.id == provinceId,
-    );
-    return province?.name ?? 'Unknown';
-  }
-
-  String _getStationName(String? stationId) {
-    final station = controller.stations.firstWhereOrNull(
-      (station) => station.id == stationId,
-    );
-    return station?.name ?? 'Unknown';
-  }
-
   void _showDeleteConfirmation(BuildContext context, TripModel trip) {
     showDialog(
       context: context,
@@ -166,14 +222,14 @@ class TripScreenDesktop extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Đóng dialog
+                Navigator.of(context).pop(); // Close dialog
               },
               child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-                controller.deleteTrip(trip); // Xóa chuyến đi
-                Navigator.of(context).pop(); // Đóng dialog sau khi xóa
+                controller.deleteTrip(trip); // Delete trip
+                Navigator.of(context).pop(); // Close dialog after deletion
               },
               child: const Text('Delete'),
             ),

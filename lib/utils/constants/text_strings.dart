@@ -57,10 +57,10 @@ class TTexts {
   // -- Application
   static const String popularTrips = "Popular Trips";
   static const String allTrips = "All Trips";
-  static const String titleSearch = "Where do you want to go?";
-  static const String pickUpPoint = "Pick up point";
+  static const String titleSearch = "What trip are you looking for?";
+  static const String pickUpPoint = "Start Station";
   static const String selectPickUpPoint = "Select pick up point";
-  static const String destination = "Destination";
+  static const String destination = "End Station";
   static const String selectDestination = "Select destination";
   static const String date = "Date";
   static const String selectDate = "Select date";
