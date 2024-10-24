@@ -44,7 +44,7 @@ class UserManagementTabletMobileScreen extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 8),
           child: ListTile(
             title: Text('${user.firstName} ${user.lastName}'),
-            subtitle: Text('Email: ${TFormatter.formatCellValue(user.email)}\nPhone: ${TFormatter.formatCellValue(user.phoneNumber)}\nUsername: ${TFormatter.formatCellValue(user.username)}\nRole: ${TFormatter.formatCellValue(user.role.name)}'),
+            subtitle: Text('Email: ${TFormatter.formatCellValue(user.email)}\nPhone: ${TFormatter.formatCellValue(user.phoneNumber)}\nRole: ${TFormatter.formatCellValue(user.role.name)}'),
             trailing:  SizedBox(
               width: 80, // Adjust width based on your layout
               child: Row(

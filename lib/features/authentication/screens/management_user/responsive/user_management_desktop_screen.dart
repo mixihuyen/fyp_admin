@@ -59,7 +59,6 @@ class UserManagementDesktopScreen extends StatelessWidget {
                   columns: const [
                     DataColumn(label: Text('First Name')),
                     DataColumn(label: Text('Last Name')),
-                    DataColumn(label: Text('Username')),
                     DataColumn(label: Text('Email')),
                     DataColumn(label: Text('Phone')),
                     DataColumn(label: Text('Role')),
@@ -85,8 +84,6 @@ class UserManagementDesktopScreen extends StatelessWidget {
             Text(TFormatter.formatCellValue(user.firstName), style: textStyle)),
         DataCell(
             Text(TFormatter.formatCellValue(user.lastName), style: textStyle)),
-        DataCell(
-            Text(TFormatter.formatCellValue(user.username), style: textStyle)),
         DataCell(
             Text(TFormatter.formatCellValue(user.email), style: textStyle)),
         DataCell(Text(TFormatter.formatCellValue(user.phoneNumber),

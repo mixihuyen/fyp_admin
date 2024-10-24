@@ -16,12 +16,12 @@ class TLoginHeader extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Image(
             image: AssetImage(TImages.lightAppLogo),
-            width: 150,
-            height: 150,
+            width: 200,
+            height: 200,
           ),
           const SizedBox(height: TSizes.spaceBtwSections),
           Text(TTexts.loginTitle,
