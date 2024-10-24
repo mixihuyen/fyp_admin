@@ -34,8 +34,8 @@ class TSidebar extends StatelessWidget {
                   children: [
                     Text('MENU', style: Theme.of(context).textTheme.bodySmall!.apply(letterSpacingDelta: 1.2)),
                     const TMenuItem(route: TRoutes.trip,icon: Iconsax.ticket, itemName: 'Trips'),
-                    const TMenuItem(route: TRoutes.station,icon: Iconsax.location, itemName: 'Stations'),
                     const TMenuItem(route: TRoutes.province,icon: Iconsax.home, itemName: 'Provinces'),
+                    const TMenuItem(route: TRoutes.station,icon: Iconsax.location, itemName: 'Stations'),
                     const TMenuItem(route: TRoutes.categories,icon: Iconsax.category, itemName: 'Categories'),
                     const TMenuItem(route: TRoutes.userManagement,icon: Iconsax.user, itemName: 'User Management'),
                     const TMenuItem(route: TRoutes.orders,icon: Iconsax.card_tick, itemName: 'Order Management'),

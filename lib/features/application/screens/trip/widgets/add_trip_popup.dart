@@ -7,9 +7,9 @@ import '../../../models/start_model.dart';
 import '../../../models/end_model.dart';
 
 class AddTripPopup extends StatefulWidget {
-  final TripModel? trip; // Thêm tham số chuyến đi để chỉnh sửa
+  final TripModel? trip;
 
-  const AddTripPopup({super.key, this.trip}); // Nhận tham số trip nếu có
+  const AddTripPopup({super.key, this.trip});
 
   @override
   _AddTripPopupState createState() => _AddTripPopupState();
@@ -35,7 +35,6 @@ class _AddTripPopupState extends State<AddTripPopup> {
   void initState() {
     super.initState();
     if (widget.trip != null) {
-      // Điền trước dữ liệu nếu chỉnh sửa chuyến đi
       priceController.text = widget.trip!.price.toString();
       selectedStartLocation = widget.trip!.start?.startLocation;
       selectedEndLocation = widget.trip!.end?.endLocation;
@@ -99,71 +98,7 @@ class _AddTripPopupState extends State<AddTripPopup> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Start Province and End Province Dropdowns
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Obx(() {
-                          if (controller.provinces.isEmpty) {
-                            return const CircularProgressIndicator();
-                          }
-                          return DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Start Province',
-                              labelStyle: smallTextStyle,
-                            ),
-                            value: selectedStartProvince,
-                            items: controller.provinces.map((province) {
-                              return DropdownMenuItem(
-                                value: province.id,
-                                child: Text(province.name, style: smallTextStyle),
-                              );
-                            }).toList(),
-                            validator: (value) => value == null
-                                ? 'Please select a start province'
-                                : null,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedStartProvince = value;
-                              });
-                            },
-                          );
-                        }),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Obx(() {
-                          if (controller.provinces.isEmpty) {
-                            return const CircularProgressIndicator();
-                          }
-                          return DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'End Province',
-                              labelStyle: smallTextStyle,
-                            ),
-                            value: selectedEndProvince,
-                            items: controller.provinces.map((province) {
-                              return DropdownMenuItem(
-                                value: province.id,
-                                child: Text(province.name, style: smallTextStyle),
-                              );
-                            }).toList(),
-                            validator: (value) => value == null
-                                ? 'Please select an end province'
-                                : null,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedEndProvince = value;
-                              });
-                            },
-                          );
-                        }),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Start Station and End Station Dropdowns
+                  // Start Station and Start Province
                   Row(
                     children: [
                       Expanded(
@@ -177,7 +112,9 @@ class _AddTripPopupState extends State<AddTripPopup> {
                               labelStyle: smallTextStyle,
                             ),
                             value: selectedStartLocation,
-                            items: controller.stations.map((station) {
+                            items: controller.stations
+                                .where((station) => station.id != selectedEndLocation)
+                                .map((station) {
                               return DropdownMenuItem(
                                 value: station.id,
                                 child: Text(station.name, style: smallTextStyle),
@@ -189,12 +126,34 @@ class _AddTripPopupState extends State<AddTripPopup> {
                             onChanged: (value) {
                               setState(() {
                                 selectedStartLocation = value;
+                                selectedStartProvince = controller
+                                    .getProvinceForStation(value!)
+                                    ?.id;
                               });
                             },
                           );
                         }),
                       ),
                       const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Start Province',
+                            labelStyle: smallTextStyle,
+                          ),
+                          controller: TextEditingController(
+                            text: controller.getProvinceForStation(selectedStartLocation)?.name ?? '',
+                          ),
+                          readOnly: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // End Station and End Province
+                  Row(
+                    children: [
                       Expanded(
                         child: Obx(() {
                           if (controller.stations.isEmpty) {
@@ -206,7 +165,9 @@ class _AddTripPopupState extends State<AddTripPopup> {
                               labelStyle: smallTextStyle,
                             ),
                             value: selectedEndLocation,
-                            items: controller.stations.map((station) {
+                            items: controller.stations
+                                .where((station) => station.id != selectedStartLocation)
+                                .map((station) {
                               return DropdownMenuItem(
                                 value: station.id,
                                 child: Text(station.name, style: smallTextStyle),
@@ -218,10 +179,26 @@ class _AddTripPopupState extends State<AddTripPopup> {
                             onChanged: (value) {
                               setState(() {
                                 selectedEndLocation = value;
+                                selectedEndProvince = controller
+                                    .getProvinceForStation(value!)
+                                    ?.id;
                               });
                             },
                           );
                         }),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'End Province',
+                            labelStyle: smallTextStyle,
+                          ),
+                          controller: TextEditingController(
+                            text: controller.getProvinceForStation(selectedEndLocation)?.name ?? '',
+                          ),
+                          readOnly: true,
+                        ),
                       ),
                     ],
                   ),
@@ -305,7 +282,9 @@ class _AddTripPopupState extends State<AddTripPopup> {
                             labelStyle: smallTextStyle,
                           ),
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter a price';
@@ -317,7 +296,6 @@ class _AddTripPopupState extends State<AddTripPopup> {
                           },
                         ),
                       ),
-
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -328,7 +306,7 @@ class _AddTripPopupState extends State<AddTripPopup> {
                     children: [
                       OutlinedButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // Close the popup
+                          Navigator.of(context).pop();
                         },
                         child: const Text(
                           'Cancel',
@@ -340,7 +318,7 @@ class _AddTripPopupState extends State<AddTripPopup> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             final trip = TripModel(
-                              id: widget.trip?.id ?? '', // Use ID if editing
+                              id: widget.trip?.id ?? '',
                               price: double.parse(priceController.text),
                               categoryId: selectedCategory,
                               start: StartModel(
@@ -360,14 +338,12 @@ class _AddTripPopupState extends State<AddTripPopup> {
                             );
 
                             if (widget.trip != null) {
-                              // Update trip
                               controller.updateTrip(trip);
                             } else {
-                              // Add new trip
                               controller.addTrip(trip);
                             }
 
-                            Navigator.of(context).pop(); // Close the popup
+                            Navigator.of(context).pop();
                           } else {
                             Get.snackbar(
                               'Form Incomplete',

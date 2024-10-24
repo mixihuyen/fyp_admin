@@ -37,7 +37,8 @@ class TripScreenTabletMobile extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.add),
-                      onPressed: () {
+                      onPressed: () async {
+                        await controller.fetchStations();
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true, // Để cho phép điều chỉnh chiều cao của bottom sheet

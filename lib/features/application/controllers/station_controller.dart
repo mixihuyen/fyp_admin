@@ -16,19 +16,19 @@ class StationController extends GetxController {
     ever(searchQuery, (_) => filterStations()); // Listen to search query changes and filter stations
   }
 
-  // Add a new station to Firestore
-  Future<void> addStation(String name) async {
-    try {
-      DocumentReference docRef = await _firestore.collection('Station').add({
-        'name': name,
-      });
-      stations.add(StationModel(id: docRef.id, name: name));
-      filteredStations.value = stations; // Update filtered list after adding
-      TLoaders.successSnackBar(title: 'Success', message: 'Station added successfully');
-    } catch (e) {
-      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add station: ${e.toString()}');
-    }
-  }
+  // // Add a new station to Firestore
+  // Future<void> addStation(String name) async {
+  //   try {
+  //     DocumentReference docRef = await _firestore.collection('Station').add({
+  //       'name': name,
+  //     });
+  //     stations.add(StationModel(id: docRef.id, name: name));
+  //     filteredStations.value = stations; // Update filtered list after adding
+  //     TLoaders.successSnackBar(title: 'Success', message: 'Station added successfully');
+  //   } catch (e) {
+  //     TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add station: ${e.toString()}');
+  //   }
+  // }
 
   // Update station in Firestore
   Future<void> updateStation(String id, String newName) async {
@@ -89,4 +89,19 @@ class StationController extends GetxController {
       }).toList();
     }
   }
+  // Add a new station with a selected province
+  Future<void> addStation(String name, String provinceId) async {
+    try {
+      DocumentReference docRef = await _firestore.collection('Station').add({
+        'name': name,
+        'provinceId': provinceId,
+      });
+      stations.add(StationModel(id: docRef.id, name: name, provinceId: provinceId));
+      filteredStations.value = stations; // Update filtered list after adding
+      TLoaders.successSnackBar(title: 'Success', message: 'Station added successfully');
+    } catch (e) {
+      TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add station: ${e.toString()}');
+    }
+  }
+
 }

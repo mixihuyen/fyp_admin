@@ -10,6 +10,7 @@ import '../models/province_model.dart';
 
 class TripController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   var stations = <StationModel>[].obs;
   var categories = <CategoryModel>[].obs;
   var provinces = <ProvinceModel>[].obs;
@@ -31,8 +32,19 @@ class TripController extends GetxController {
     ever(searchQuery, (_) => filterTrips());
   }
 
+  // Helper method to get the province for a given station
+  ProvinceModel? getProvinceForStation(String? stationId) {
+    if (stationId == null) return null;
+
+    final station = stations.firstWhereOrNull((station) => station.id == stationId);
+    if (station != null) {
+      return provinces.firstWhereOrNull((province) => province.id == station.provinceId);
+    }
+    return null;
+  }
+
   // Fetch stations
-  void fetchStations() async {
+  Future<void> fetchStations() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore.collection('Station').get();
       stations.value = querySnapshot.docs.map((doc) {
@@ -44,7 +56,7 @@ class TripController extends GetxController {
   }
 
   // Fetch categories
-  void fetchCategories() async {
+  Future<void> fetchCategories() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore.collection('Categories').get();
       categories.value = querySnapshot.docs.map((doc) {
@@ -56,7 +68,7 @@ class TripController extends GetxController {
   }
 
   // Fetch provinces
-  void fetchProvinces() async {
+  Future<void> fetchProvinces() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore.collection('Provinces').get();
       provinces.value = querySnapshot.docs.map((doc) {
@@ -72,6 +84,10 @@ class TripController extends GetxController {
     try {
       await _tripRepository.addTripAndLinkToCategory(trip);
       TLoaders.successSnackBar(title: 'Success', message: 'Trip added successfully');
+
+      // Refresh data after adding a trip
+      await fetchStations();
+      await fetchProvinces();
       fetchTrips(); // Reload trips after adding a new one
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to add trip: ${e.toString()}');
@@ -83,6 +99,10 @@ class TripController extends GetxController {
     try {
       await _tripRepository.updateTrip(trip);
       TLoaders.successSnackBar(title: 'Success', message: 'Trip updated successfully');
+
+      // Refresh data after updating a trip
+      await fetchStations();
+      await fetchProvinces();
       fetchTrips(); // Reload trips after updating
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to update trip: ${e.toString()}');
@@ -94,6 +114,10 @@ class TripController extends GetxController {
     try {
       await _firestore.collection('Trips').doc(trip.id).delete();
       TLoaders.successSnackBar(title: 'Success', message: 'Trip deleted successfully');
+
+      // Refresh data after deleting a trip
+      await fetchStations();
+      await fetchProvinces();
       fetchTrips(); // Reload trips after deleting
     } catch (e) {
       TLoaders.errorSnackBar(title: 'Error', message: 'Failed to delete trip: ${e.toString()}');
@@ -101,7 +125,7 @@ class TripController extends GetxController {
   }
 
   // Fetch trips from Firestore
-  void fetchTrips() async {
+  Future<void> fetchTrips() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore.collection('Trips').get();
       trips.value = querySnapshot.docs.map((doc) {
@@ -128,7 +152,7 @@ class TripController extends GetxController {
         final matchesEndStation = _getStationName(trip.end?.endLocation).toLowerCase().contains(query);
         final matchesCategory = _getCategoryName(trip.categoryId).toLowerCase().contains(query);
 
-        // Match departure and arrival times (now strings)
+        // Match departure and arrival times
         final matchesDepartureTime = (trip.start?.departureTime ?? '').toLowerCase().contains(query);
         final matchesArrivalTime = (trip.end?.arrivalTime ?? '').toLowerCase().contains(query);
 
@@ -141,7 +165,6 @@ class TripController extends GetxController {
       }).toList();
     }
   }
-
 
   // Helper methods to get names from IDs
   String _getCategoryName(String? categoryId) {

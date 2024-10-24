@@ -30,7 +30,8 @@ class TripScreenDesktop extends StatelessWidget {
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
-                        onPressed: () {
+                        onPressed: () async {
+                          await controller.fetchStations();
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
