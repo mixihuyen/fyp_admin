@@ -1,6 +1,10 @@
-# 🌟 Crystal Limousine Web App 🚗✨
+# 🌟 Crystal Limousine Management Web App 🚗✨
 
 Welcome to the **Crystal Limousine Web App**, a vibrant, user-friendly platform built with **Flutter Web** and powered by **Android Studio**. This app streamlines trip management, user administration, and ticket booking with a stunning, responsive design for desktop, tablet, and mobile devices. 🚀
+
+
+📌 **GitHub Repository**: [mixihuyen/fyp_admin](https://github.com/mixihuyen/fyp_admin)  
+📲 **Live Demo**: [Crystal-Limousine-Management-Web-App](https://final-year-project-b2150.web.app)
 
 ---
 
