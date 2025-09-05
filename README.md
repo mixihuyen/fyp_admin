@@ -77,14 +77,13 @@ Test across desktop, tablet, and mobile for a responsive experience! ✨
 ## 💻 Technologies Used
 - **Frontend**: Flutter Web
 - **IDE**: Android Studio
-- **Backend**: (Specify if applicable, e.g., Firebase)
-- **Database**: (Specify if applicable, e.g., Firestore)
+- **Backend**: Firebase
+- **Database**: Firestore
 
 ---
 
 ## 🌟 Notes
 - Intuitive, responsive, and visually stunning design.
 - Secure deletion with confirmation prompts.
-- For API queries, visit [xAI API](https://x.ai/api).
 
 Ride in style with the Crystal Limousine Web App! 🚀✨
